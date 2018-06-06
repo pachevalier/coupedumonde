@@ -1,0 +1,59 @@
+---
+title: "L'équipe de France en data"
+output: 
+  flexdashboard::flex_dashboard:
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library("flexdashboard")
+library("rvest")
+library("purrr")
+library("dplyr")
+library("ggplot2")
+library("lubridate")
+library("ggthemes")
+library("wesanderson")
+library("DT")
+load(file = "df_matches.Rda")
+```
+
+Timeline {data-icon="fa-list"}
+=====================================
+
+
+Column {data-width=500}
+-------------------------------------
+
+```{r fig.height=20, dev='png'}
+df_matches %>% 
+  ggplot() +
+  geom_tile(
+    mapping = aes(y = year, x = no, fill = outcome), 
+    color = "white"
+      ) + 
+  scale_fill_manual(
+    values = c("#879CA2", "#CB361E", "#006B97"), 
+    labels = c("Nul", "Défaite", "Victoire"),
+    name = "Code couleur"
+    ) + 
+  scale_y_reverse(
+    name = "Année"
+  ) + 
+  theme_fivethirtyeight() + 
+  theme(
+    rect = element_blank(), 
+    legend.position = "bottom"
+    ) + 
+  coord_equal()
+```
+
+
+Données {data-icon="fa-list"}
+=====================================
+
+```{r}
+df_matches %>%
+  datatable()
+```
+
