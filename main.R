@@ -7,7 +7,10 @@ library("ggthemes")
 library("wesanderson")
 patrick <- "([[:digit:]])\\-([[:digit:]]).*"
 
-list_tables <- read_html("https://fr.wikipedia.org/w/index.php?title=Liste_des_matchs_de_l%27%C3%A9quipe_de_France_de_football_par_adversaire&oldid=149219728") %>% 
+# list_tables <- read_html("https://fr.wikipedia.org/w/index.php?title=Liste_des_matchs_de_l%27%C3%A9quipe_de_France_de_football_par_adversaire&oldid=149219728") %>% 
+#   html_table(fill = TRUE) 
+
+list_tables <- read_html("https://fr.wikipedia.org/w/index.php?title=Liste_des_matchs_de_l%27%C3%A9quipe_de_France_de_football_par_adversaire&oldid=149941933") %>% 
   html_table(fill = TRUE) 
 
 df_matches <- list_tables %>%
@@ -87,46 +90,38 @@ df_matches <- list_tables %>%
   ) %>%
   group_by(year) %>%
   arrange(date) %>% 
-  mutate(no = row_number()) 
+  mutate(no = row_number()) %>%
+  filter(is.na(score_france) == FALSE)
+
 save(df_matches, file = "df_matches.Rda")
 
+plot_timeline <- df_matches %>% 
+  ggplot() +
+  geom_tile(
+    mapping = aes(y = year, x = no, fill = outcome), 
+    color = "white"
+  ) + 
+  scale_fill_manual(
+    values = c("#879CA2", "#CB361E", "#006B97"), 
+    labels = c("Nul", "Défaite", "Victoire"),
+    name = "Code couleur"
+  ) + 
+  scale_y_reverse(
+    name = "Année", 
+    breaks = seq(1900, 2020, by = 4)
+  ) + 
+  theme_fivethirtyeight() + 
+  theme(
+    rect = element_blank(), 
+    legend.position = "bottom"
+  ) + 
+  coord_equal() + 
+  labs(title = "Histoire de l'équipe \n de France") 
+
+plot_timeline %>% ggsave(filename = "timeline.png")
+
+df_matches %>% nrow()
+
 df_matches %>% 
-  glimpse()
-
-df_matches %>%
-  mutate(
-
-    ) %>%
-  glimpse()
-
-    
-df_matches %>%
   group_by(outcome) %>%
-  count() %>% 
-  ggplot()
-
-
-df_matches %>% View()
-# 
-# df_matches %>% 
-#   ggplot() +
-#   geom_tile(
-#     mapping = aes(y = year, x = no, fill = outcome), 
-#     color = "white"
-#       ) + 
-#   scale_fill_manual(
-#     values = c("#879CA2", "#CB361E", "#006B97"), 
-#     labels = c("Nul", "Défaite", "Victoire"),
-#     name = "Code couleur"
-#     ) + 
-#   scale_y_reverse(
-#     name = "Année"
-#   ) + 
-#   theme_fivethirtyeight() + 
-#   theme(
-#     rect = element_blank(), 
-#     legend.position = "bottom"
-#     ) + 
-#   coord_equal()
-# 
-# library(tweenr)
+  summarise(n = n())
