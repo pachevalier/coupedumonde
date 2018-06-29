@@ -5,6 +5,7 @@ library("ggplot2")
 library("lubridate")
 library("ggthemes")
 library("wesanderson")
+library("readr")
 patrick <- "([[:digit:]])\\-([[:digit:]]).*"
 
 # list_tables <- read_html("https://fr.wikipedia.org/w/index.php?title=Liste_des_matchs_de_l%27%C3%A9quipe_de_France_de_football_par_adversaire&oldid=149219728") %>% 
@@ -93,7 +94,8 @@ df_matches <- list_tables %>%
   mutate(no = row_number()) %>%
   filter(is.na(score_france) == FALSE)
 
-save(df_matches, file = "df_matches.Rda")
+write_csv(x = df_matches, path = "df_matches.csv")
+#save(df_matches, file = "df_matches.Rda")
 
 plot_timeline <- df_matches %>% 
   ggplot() +
@@ -108,20 +110,22 @@ plot_timeline <- df_matches %>%
   ) + 
   scale_y_reverse(
     name = "Année", 
-    breaks = seq(1900, 2020, by = 4)
+    breaks = seq(1902, 2018, by = 4)
   ) + 
-  theme_fivethirtyeight() + 
   theme(
     rect = element_blank(), 
     legend.position = "bottom"
   ) + 
   coord_equal() + 
-  labs(title = "Histoire de l'équipe \n de France") 
+  labs(title = "Histoire de l'équipe de France") 
+
+plot_timeline
 
 plot_timeline %>% ggsave(filename = "timeline.png")
 
 df_matches %>% nrow()
 
+df_matches$date %>% min()
 df_matches %>% 
   group_by(outcome) %>%
   summarise(n = n())
