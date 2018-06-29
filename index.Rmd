@@ -15,7 +15,9 @@ library("lubridate")
 library("ggthemes")
 library("wesanderson")
 library("DT")
-load(file = "df_matches.Rda")
+library("readr")
+df_matches <- read_csv("df_matches.csv")
+#load(file = "df_matches.Rda")
 ```
 
 Timeline {data-icon="fa-list"}
